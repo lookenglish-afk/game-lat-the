@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trò Chơi Thẻ Đặc Quyền</title>
-    <!-- Pháo hoa giấy Confetti -->
+    <title>Thẻ Đặc Quyền - Hào Quang & Shuffle Ngẫu Nhiên</title>
+    <!-- Pháo hoa Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Mali:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -17,7 +17,7 @@
 
         body {
             font-family: 'Mali', cursive, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at center, #2e1a47 0%, #0f0c1b 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -25,101 +25,179 @@
             justify-content: flex-start;
             padding: 20px;
             overflow-x: hidden;
+            color: #fff;
         }
 
-        /* Tiêu đề chính */
+        /* Banner tiêu đề */
         .title-banner {
-            background: #ff477e;
+            background: linear-gradient(90deg, #ff0844 0%, #ffb199 100%);
             color: #fff;
             padding: 12px 45px;
             border-radius: 50px;
             font-size: 2.2rem;
             font-weight: 700;
             text-transform: uppercase;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 -4px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 0 25px rgba(255, 8, 68, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2);
             border: 4px solid #fff;
             margin-bottom: 25px;
             letter-spacing: 2px;
-            animation: bounce 2s infinite ease-in-out;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* Lưới các thẻ bài */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            max-width: 1000px;
-            width: 100%;
-            perspective: 1000px;
-        }
-
-        /* Thẻ đặc quyền */
-        .card-wrapper {
-            aspect-ratio: 3 / 4;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-
-        .card-inner {
+        /* Khu vực sân khấu hiển thị thẻ */
+        .arena-container {
             position: relative;
             width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            box-shadow: 0 12px 20px rgba(0,0,0,0.2);
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), box-shadow 0.3s;
-            background: linear-gradient(145deg, #ff9a9e 0%, #fecfef 100%);
-            border: 4px solid #ffffff;
+            max-width: 1050px;
+            height: 520px;
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Thẻ bài cùng hiệu ứng hào quang Aura Glow */
+        .card {
+            position: absolute;
+            width: 190px;
+            height: 240px;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 100%);
+            border: 3px solid rgba(255, 255, 255, 0.9);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-origin: center center;
+            z-index: 10;
+            /* Hiệu ứng hào quang tỏa sáng liên tục */
+            box-shadow: 0 0 15px rgba(255, 117, 140, 0.5), 
+                        0 0 30px rgba(255, 126, 179, 0.3);
+            animation: pulseAura 2.5s infinite alternate ease-in-out;
         }
 
-        .card-wrapper:hover .card-inner {
-            transform: translateY(-8px) scale(1.03);
-            box-shadow: 0 16px 28px rgba(0,0,0,0.35);
+        @keyframes pulseAura {
+            0% {
+                box-shadow: 0 0 15px rgba(255, 117, 140, 0.6), 0 0 30px rgba(255, 126, 179, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 28px rgba(255, 75, 43, 0.9), 0 0 50px rgba(255, 140, 0, 0.6);
+            }
         }
 
-        .card-wrapper.opened .card-inner {
+        .card:hover:not(.shuffling):not(.opened) {
+            transform: scale(1.08) translateY(-10px) !important;
+            box-shadow: 0 0 35px #00f2fe, 0 0 60px #4facfe !important;
+            border-color: #fff;
+            z-index: 50;
+        }
+
+        /* Hào quang rực lửa khi được chọn ngẫu nhiên */
+        .card.spotlight {
+            box-shadow: 0 0 45px #ffe600, 0 0 80px #ff7b00 !important;
+            border-color: #ffe600 !important;
+            z-index: 60 !important;
+            transform: scale(1.15) !important;
+        }
+
+        .card.opened {
+            opacity: 0.3;
+            filter: grayscale(1);
+            cursor: not-allowed;
+            pointer-events: none;
+            box-shadow: none !important;
+            animation: none !important;
+        }
+
+        .card-badge {
+            font-size: 3.6rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .card-label {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #d63384;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 2px dashed #d63384;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* Thanh điều khiển */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .btn {
+            padding: 12px 26px;
+            font-family: inherit;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-shuffle {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #5c2c00;
+            border: 2px solid #fff;
+        }
+
+        .btn-random {
+            background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .btn-config {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+        }
+
+        .btn:disabled {
             opacity: 0.5;
-            filter: grayscale(0.8);
             cursor: not-allowed;
             transform: none !important;
         }
 
-        .card-badge {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-        }
-
-        .card-label {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #d63384;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 5px 18px;
-            border-radius: 30px;
-            border: 2px dashed #d63384;
-        }
-
-        /* Khung hiển thị phóng to (Modal kết quả) */
+        /* Pop-up Thưởng lớn */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(0, 0, 0, 0.75);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
 
         .modal.active {
@@ -135,190 +213,393 @@
         .modal-card {
             background: #fff;
             width: 90%;
-            max-width: 450px;
-            border-radius: 30px;
+            max-width: 480px;
+            border-radius: 35px;
             border: 8px solid #ff477e;
-            padding: 30px 20px;
+            padding: 35px 25px;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            transform: scale(0.6);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 50px rgba(255, 71, 126, 0.6);
             animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            position: relative;
         }
 
         @keyframes popUp {
+            from { transform: scale(0.6); }
             to { transform: scale(1); }
         }
 
         .modal-header-tag {
             background: #ffe066;
             color: #d63384;
-            padding: 8px 20px;
+            padding: 8px 25px;
             border-radius: 20px;
             display: inline-block;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 15px;
-            border: 2px solid #ff922b;
+            border: 3px solid #ff922b;
         }
 
         .modal-emoji {
-            font-size: 5rem;
+            font-size: 5.5rem;
             margin: 10px 0;
-            animation: shake 1.5s infinite;
+            animation: bounceEmoji 1.5s infinite ease-in-out;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            75% { transform: rotate(10deg); }
+        @keyframes bounceEmoji {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .modal-text {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #333;
+            color: #2b2d42;
             margin: 20px 0 30px 0;
             line-height: 1.4;
         }
 
-        .btn-close {
+        .btn-claim {
             background: #51cf66;
             color: white;
             border: none;
             font-family: inherit;
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             font-weight: 700;
-            padding: 12px 35px;
+            padding: 12px 40px;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 6px 15px rgba(81, 207, 102, 0.4);
+            box-shadow: 0 6px 18px rgba(81, 207, 102, 0.5);
             transition: all 0.2s;
         }
 
-        .btn-close:hover {
-            transform: scale(1.05);
+        .btn-claim:hover {
+            transform: scale(1.06);
             background: #40c057;
         }
 
-        /* Nút công cụ bên dưới */
-        .controls {
-            margin-top: 30px;
+        /* Modal Chỉnh Sửa Phần Thưởng */
+        .config-modal-card {
+            background: #251d38;
+            color: #fff;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 25px;
+            padding: 25px;
             display: flex;
-            gap: 15px;
+            flex-direction: column;
+            border: 3px solid #7952b3;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
 
-        .btn-tool {
-            padding: 10px 22px;
+        .config-header {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ffb199;
+        }
+
+        .config-list {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .config-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255,255,255,0.06);
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .config-item input.icon-input {
+            width: 55px;
+            text-align: center;
+            font-size: 1.4rem;
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #191424;
+            color: #fff;
+        }
+
+        .config-item input.text-input {
+            flex: 1;
+            padding: 8px 12px;
             font-family: inherit;
             font-size: 1rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.9);
-            color: #495057;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: all 0.2s;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #191424;
+            color: #fff;
         }
 
-        .btn-tool:hover {
-            background: #fff;
-            transform: translateY(-2px);
+        .config-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Tiêu đề trên bảng -->
-    <div class="title-banner">⭐ CHỌN THẺ ĐẶC QUYỀN ⭐</div>
+    <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LỚP HỌC ⭐</div>
 
-    <!-- Danh sách thẻ -->
-    <div class="grid-container" id="grid"></div>
+    <!-- Sân khấu thẻ -->
+    <div class="arena-container" id="arena"></div>
 
-    <!-- Khung xem thẻ mở rộng (Pop-up) -->
+    <!-- Thanh công cụ điều khiển -->
+    <div class="controls">
+        <button class="btn btn-shuffle" id="shuffleBtn" onclick="startCircularShuffle()">
+            🌪️ Xáo Tròn
+        </button>
+        <button class="btn btn-random" id="randomBtn" onclick="shuffleAndPickRandom()">
+            🎯 Shuffle & Chọn Thẻ
+        </button>
+        <button class="btn btn-reset" onclick="resetGame()">
+            🔄 Đặt Lại
+        </button>
+        <button class="btn btn-config" onclick="openConfigModal()">
+            ⚙️ Cài Đặt Quà
+        </button>
+    </div>
+
+    <!-- Modal Xem Phần Thưởng Nhận Được -->
     <div class="modal" id="rewardModal">
         <div class="modal-card">
-            <div class="modal-header-tag">✨ THẺ ĐẶC QUYỀN ✨</div>
+            <div class="modal-header-tag">✨ ĐẶC QUYỀN CỦA EM ✨</div>
             <div class="modal-emoji" id="rewardEmoji">👑</div>
             <div class="modal-text" id="rewardText">Được làm lớp trưởng 1 tuần</div>
-            <button class="btn-close" onclick="closeReward()">Nhận Thưởng 🎉</button>
+            <button class="btn-claim" onclick="closeReward()">Nhận Thưởng 🎉</button>
         </div>
     </div>
 
-    <!-- Điều khiển -->
-    <div class="controls">
-        <button class="btn-tool" onclick="resetGame()">🔄 Đặt lại lượt chơi</button>
-        <button class="btn-tool" onclick="editRewards()">✏️ Tùy chỉnh quà tặng</button>
+    <!-- Modal Cấu Hình Phần Thưởng -->
+    <div class="modal" id="configModal">
+        <div class="config-modal-card">
+            <div class="config-header">⚙️ Danh Sách Đặc Quyền Của Lớp</div>
+            <div class="config-list" id="configList"></div>
+            <div class="config-footer">
+                <button class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
+                <button class="btn btn-claim" onclick="saveConfig()">Lưu Thay Đổi</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Danh sách quà / đặc quyền mặc định (Thầy cô có thể thêm bớt tùy ý)
-        let rewards = [
+        // Mảng dữ liệu phần thưởng (Lưu mặc định vào localStorage nếu có chỉnh sửa)
+        const defaultRewards = [
             { text: "Được làm Lớp Trưởng trong 1 tuần!", icon: "👑" },
-            { text: "Miễn 1 lần kiểm tra miệng / bài tập về nhà!", icon: "📜" },
-            { text: "Được chọn chỗ ngồi yêu thích trong 3 ngày!", icon: "🪑" },
-            { text: "Nhận 1 phần quà đặc biệt từ Thầy/Cô!", icon: "🎁" },
-            { text: "Được cộng 1 điểm vào bài kiểm tra tới!", icon: "💯" },
-            { text: "Được chỉ định một bạn bất kỳ hát 1 bài!", icon: "🎤" },
-            { text: "Được làm Quản Trò trong giờ giải lao!", icon: "🎮" },
-            { text: "Được miễn trực nhật nhật lớp 1 buổi!", icon: "🧹" }
+            { text: "Miễn 1 lần kiểm tra bài cũ / bài tập!", icon: "📜" },
+            { text: "Được đổi chỗ ngồi theo ý thích 3 ngày!", icon: "🪑" },
+            { text: "Nhận 1 phần quà bí mật từ Thầy/Cô!", icon: "🎁" },
+            { text: "Được cộng 1 điểm vào bài thi tới!", icon: "💯" },
+            { text: "Được yêu cầu một bạn bất kỳ hát 1 bài!", icon: "🎤" },
+            { text: "Làm Quản Trò giờ giải lao buổi hôm nay!", icon: "🎮" },
+            { text: "Được miễn trực nhật lớp 1 buổi!", icon: "🧹" }
         ];
 
-        // Tạo hiệu ứng âm thanh bằng Web Audio API (không sợ mất mạng hay lỗi file mp3)
+        let rewards = JSON.parse(localStorage.getItem('classroom_rewards')) || defaultRewards;
+
+        const arena = document.getElementById('arena');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        let isShuffling = false;
+
+        // Âm thanh Web Audio API
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playFanfare() {
+
+        function playWhooshSound() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const notes = [261.63, 329.63, 392.00, 523.25]; // Đô - Mi - Sol - Đố
-            notes.forEach((freq, index) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(650, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function playVictorySound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const notes = [261.6, 329.6, 392.0, 523.3, 659.3];
+            notes.forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.12);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + index * 0.12);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.12 + 0.5);
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.5);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + index * 0.12);
-                osc.stop(audioCtx.currentTime + index * 0.12 + 0.5);
+                osc.start(audioCtx.currentTime + idx * 0.1);
+                osc.stop(audioCtx.currentTime + idx * 0.1 + 0.5);
             });
         }
 
-        // Vẽ thẻ ra màn hình
-        const grid = document.getElementById('grid');
-        function renderCards() {
-            grid.innerHTML = '';
+        // Tọa độ dạng lưới 2 hàng x 4 cột
+        function getGridPosition(index) {
+            const cardW = 190, cardH = 240, gapX = 40, gapY = 30;
+            const cols = 4;
+            const row = Math.floor(index / cols);
+            const col = index % cols;
+
+            const totalW = cols * cardW + (cols - 1) * gapX;
+            const startX = -totalW / 2 + cardW / 2;
+            const startY = - (2 * cardH + gapY) / 2 + cardH / 2;
+
+            const x = startX + col * (cardW + gapX);
+            const y = startY + row * (cardH + gapY);
+            return { x, y };
+        }
+
+        // Vẽ các thẻ ra màn hình
+        function initCards() {
+            arena.innerHTML = '';
             rewards.forEach((item, index) => {
                 const card = document.createElement('div');
-                card.className = 'card-wrapper';
+                card.className = 'card';
                 card.id = `card-${index}`;
                 card.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-badge">🧧</div>
-                        <div class="card-label">Thẻ số ${index + 1}</div>
-                    </div>
+                    <div class="card-badge">🧧</div>
+                    <div class="card-label">Thẻ số ${index + 1}</div>
                 `;
+                const pos = getGridPosition(index);
+                card.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(0deg)`;
                 card.onclick = () => openCard(index);
-                grid.appendChild(card);
+                arena.appendChild(card);
             });
         }
 
-        // Mở thẻ và bung pháo hoa
+        function setButtonsDisabled(state) {
+            shuffleBtn.disabled = state;
+            randomBtn.disabled = state;
+        }
+
+        // Hiệu ứng xáo bài xoay vòng tròn
+        function startCircularShuffle(callback = null) {
+            if (isShuffling) return;
+            isShuffling = true;
+            setButtonsDisabled(true);
+
+            // Gỡ bỏ spotlight nếu có
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('spotlight'));
+
+            const total = rewards.length;
+            const radius = 240;
+            const startTime = performance.now();
+            const duration = 2400; // Xoay trong 2.4s
+            let lastAudio = 0;
+
+            function animateShuffle(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                if (elapsed - lastAudio > 140) {
+                    playWhooshSound();
+                    lastAudio = elapsed;
+                }
+
+                const baseAngle = progress * Math.PI * 6; // Xoay 3 vòng tròn
+
+                for (let i = 0; i < total; i++) {
+                    const card = document.getElementById(`card-${i}`);
+                    if (!card) continue;
+                    card.classList.add('shuffling');
+
+                    const angle = baseAngle + (i / total) * Math.PI * 2;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * (radius * 0.7);
+                    const rot = (angle * 180 / Math.PI) + 90;
+
+                    card.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(0.95)`;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateShuffle);
+                } else {
+                    // Trộn ngẫu nhiên danh sách quà
+                    rewards.sort(() => Math.random() - 0.5);
+
+                    setTimeout(() => {
+                        for (let i = 0; i < total; i++) {
+                            const card = document.getElementById(`card-${i}`);
+                            if (!card) continue;
+                            card.classList.remove('shuffling');
+                            const pos = getGridPosition(i);
+                            card.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(0deg) scale(1)`;
+                        }
+                        isShuffling = false;
+                        setButtonsDisabled(false);
+
+                        if (callback) callback();
+                    }, 250);
+                }
+            }
+
+            requestAnimationFrame(animateShuffle);
+        }
+
+        // Shuffle xoay tròn rồi tự động chọn ngẫu nhiên 1 thẻ
+        function shuffleAndPickRandom() {
+            if (isShuffling) return;
+
+            // Tìm những thẻ chưa được mở
+            const unopenedIndices = [];
+            rewards.forEach((_, idx) => {
+                const card = document.getElementById(`card-${idx}`);
+                if (card && !card.classList.contains('opened')) {
+                    unopenedIndices.push(idx);
+                }
+            });
+
+            if (unopenedIndices.length === 0) {
+                alert("Tất cả các thẻ đã được mở hết rồi! Vui lòng bấm 'Đặt Lại' nhé.");
+                return;
+            }
+
+            // Xáo bài trước, xong mới chọn
+            startCircularShuffle(() => {
+                const randomChoice = unopenedIndices[Math.floor(Math.random() * unopenedIndices.length)];
+                const chosenCard = document.getElementById(`card-${randomChoice}`);
+
+                // Tạo hiệu ứng tỏa hào quang nổi bật vào thẻ được chọn
+                chosenCard.classList.add('spotlight');
+
+                // Tự động mở thẻ sau 0.8 giây
+                setTimeout(() => {
+                    chosenCard.classList.remove('spotlight');
+                    openCard(randomChoice);
+                }, 800);
+            });
+        }
+
+        // Mở thẻ và bật hiệu ứng chúc mừng
         function openCard(index) {
+            if (isShuffling) return;
             const cardEl = document.getElementById(`card-${index}`);
             if (cardEl.classList.contains('opened')) return;
 
             cardEl.classList.add('opened');
-            playFanfare();
+            playVictorySound();
 
-            // Hiệu ứng pháo giấy confetti rơi
             confetti({
-                particleCount: 80,
-                spread: 90,
+                particleCount: 100,
+                spread: 100,
                 origin: { y: 0.6 }
             });
 
-            // Gán dữ liệu vào modal
             document.getElementById('rewardEmoji').innerText = rewards[index].icon;
             document.getElementById('rewardText').innerText = rewards[index].text;
             document.getElementById('rewardModal').classList.add('active');
@@ -328,29 +609,54 @@
             document.getElementById('rewardModal').classList.remove('active');
         }
 
-        // Khởi động lại vòng chơi
         function resetGame() {
-            document.querySelectorAll('.card-wrapper').forEach(el => el.classList.remove('opened'));
-            // Xáo trộn ngẫu nhiên phần quà
-            rewards.sort(() => Math.random() - 0.5);
+            if (isShuffling) return;
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('opened');
+                c.classList.remove('spotlight');
+            });
+            startCircularShuffle();
         }
 
-        // Tùy chỉnh danh sách quà
-        function editRewards() {
-            const input = prompt("Nhập danh sách đặc quyền (phân cách bằng dấu phẩy):", 
-                rewards.map(r => r.text).join(", ")
-            );
-            if (input) {
-                const arr = input.split(",").map(t => t.trim()).filter(t => t.length > 0);
-                if (arr.length > 0) {
-                    rewards = arr.map(text => ({ text: text, icon: "🎉" }));
-                    renderCards();
-                }
-            }
+        // ================= CÀI ĐẶT PHẦN THƯỞNG =================
+        function openConfigModal() {
+            const listContainer = document.getElementById('configList');
+            listContainer.innerHTML = '';
+
+            rewards.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = 'config-item';
+                row.innerHTML = `
+                    <input type="text" class="icon-input" id="cfg-icon-${idx}" value="${item.icon}" maxlength="3">
+                    <input type="text" class="text-input" id="cfg-text-${idx}" value="${item.text}">
+                `;
+                listContainer.appendChild(row);
+            });
+
+            document.getElementById('configModal').classList.add('active');
         }
 
-        // Khởi tạo lần đầu
-        renderCards();
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.remove('active');
+        }
+
+        function saveConfig() {
+            rewards.forEach((_, idx) => {
+                const iconVal = document.getElementById(`cfg-icon-${idx}`).value.trim();
+                const textVal = document.getElementById(`cfg-text-${idx}`).value.trim();
+                rewards[idx] = {
+                    icon: iconVal || "🎁",
+                    text: textVal || `Phần thưởng ${idx + 1}`
+                };
+            });
+
+            localStorage.setItem('classroom_rewards', JSON.stringify(rewards));
+            closeConfigModal();
+            resetGame();
+        }
+
+        // Khởi tạo thẻ ban đầu
+        initCards();
     </script>
 </body>
 </html>
