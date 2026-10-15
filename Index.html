@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi Thẻ Đặc Quyền</title>
+    <!-- Pháo hoa giấy Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Mali:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Mali', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Tiêu đề chính */
+        .title-banner {
+            background: #ff477e;
+            color: #fff;
+            padding: 12px 45px;
+            border-radius: 50px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 -4px 0 rgba(0,0,0,0.2);
+            border: 4px solid #fff;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            animation: bounce 2s infinite ease-in-out;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Lưới các thẻ bài */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            max-width: 1000px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        /* Thẻ đặc quyền */
+        .card-wrapper {
+            aspect-ratio: 3 / 4;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            box-shadow: 0 12px 20px rgba(0,0,0,0.2);
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), box-shadow 0.3s;
+            background: linear-gradient(145deg, #ff9a9e 0%, #fecfef 100%);
+            border: 4px solid #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-wrapper:hover .card-inner {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 16px 28px rgba(0,0,0,0.35);
+        }
+
+        .card-wrapper.opened .card-inner {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .card-badge {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+
+        .card-label {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #d63384;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 5px 18px;
+            border-radius: 30px;
+            border: 2px dashed #d63384;
+        }
+
+        /* Khung hiển thị phóng to (Modal kết quả) */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-card {
+            background: #fff;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 30px;
+            border: 8px solid #ff477e;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: scale(0.6);
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            position: relative;
+        }
+
+        @keyframes popUp {
+            to { transform: scale(1); }
+        }
+
+        .modal-header-tag {
+            background: #ffe066;
+            color: #d63384;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border: 2px solid #ff922b;
+        }
+
+        .modal-emoji {
+            font-size: 5rem;
+            margin: 10px 0;
+            animation: shake 1.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .modal-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin: 20px 0 30px 0;
+            line-height: 1.4;
+        }
+
+        .btn-close {
+            background: #51cf66;
+            color: white;
+            border: none;
+            font-family: inherit;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 12px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(81, 207, 102, 0.4);
+            transition: all 0.2s;
+        }
+
+        .btn-close:hover {
+            transform: scale(1.05);
+            background: #40c057;
+        }
+
+        /* Nút công cụ bên dưới */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-tool {
+            padding: 10px 22px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #495057;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        .btn-tool:hover {
+            background: #fff;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tiêu đề trên bảng -->
+    <div class="title-banner">⭐ CHỌN THẺ ĐẶC QUYỀN ⭐</div>
+
+    <!-- Danh sách thẻ -->
+    <div class="grid-container" id="grid"></div>
+
+    <!-- Khung xem thẻ mở rộng (Pop-up) -->
+    <div class="modal" id="rewardModal">
+        <div class="modal-card">
+            <div class="modal-header-tag">✨ THẺ ĐẶC QUYỀN ✨</div>
+            <div class="modal-emoji" id="rewardEmoji">👑</div>
+            <div class="modal-text" id="rewardText">Được làm lớp trưởng 1 tuần</div>
+            <button class="btn-close" onclick="closeReward()">Nhận Thưởng 🎉</button>
+        </div>
+    </div>
+
+    <!-- Điều khiển -->
+    <div class="controls">
+        <button class="btn-tool" onclick="resetGame()">🔄 Đặt lại lượt chơi</button>
+        <button class="btn-tool" onclick="editRewards()">✏️ Tùy chỉnh quà tặng</button>
+    </div>
+
+    <script>
+        // Danh sách quà / đặc quyền mặc định (Thầy cô có thể thêm bớt tùy ý)
+        let rewards = [
+            { text: "Được làm Lớp Trưởng trong 1 tuần!", icon: "👑" },
+            { text: "Miễn 1 lần kiểm tra miệng / bài tập về nhà!", icon: "📜" },
+            { text: "Được chọn chỗ ngồi yêu thích trong 3 ngày!", icon: "🪑" },
+            { text: "Nhận 1 phần quà đặc biệt từ Thầy/Cô!", icon: "🎁" },
+            { text: "Được cộng 1 điểm vào bài kiểm tra tới!", icon: "💯" },
+            { text: "Được chỉ định một bạn bất kỳ hát 1 bài!", icon: "🎤" },
+            { text: "Được làm Quản Trò trong giờ giải lao!", icon: "🎮" },
+            { text: "Được miễn trực nhật nhật lớp 1 buổi!", icon: "🧹" }
+        ];
+
+        // Tạo hiệu ứng âm thanh bằng Web Audio API (không sợ mất mạng hay lỗi file mp3)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playFanfare() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const notes = [261.63, 329.63, 392.00, 523.25]; // Đô - Mi - Sol - Đố
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + index * 0.12);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + index * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + index * 0.12 + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + index * 0.12);
+                osc.stop(audioCtx.currentTime + index * 0.12 + 0.5);
+            });
+        }
+
+        // Vẽ thẻ ra màn hình
+        const grid = document.getElementById('grid');
+        function renderCards() {
+            grid.innerHTML = '';
+            rewards.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card-wrapper';
+                card.id = `card-${index}`;
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-badge">🧧</div>
+                        <div class="card-label">Thẻ số ${index + 1}</div>
+                    </div>
+                `;
+                card.onclick = () => openCard(index);
+                grid.appendChild(card);
+            });
+        }
+
+        // Mở thẻ và bung pháo hoa
+        function openCard(index) {
+            const cardEl = document.getElementById(`card-${index}`);
+            if (cardEl.classList.contains('opened')) return;
+
+            cardEl.classList.add('opened');
+            playFanfare();
+
+            // Hiệu ứng pháo giấy confetti rơi
+            confetti({
+                particleCount: 80,
+                spread: 90,
+                origin: { y: 0.6 }
+            });
+
+            // Gán dữ liệu vào modal
+            document.getElementById('rewardEmoji').innerText = rewards[index].icon;
+            document.getElementById('rewardText').innerText = rewards[index].text;
+            document.getElementById('rewardModal').classList.add('active');
+        }
+
+        function closeReward() {
+            document.getElementById('rewardModal').classList.remove('active');
+        }
+
+        // Khởi động lại vòng chơi
+        function resetGame() {
+            document.querySelectorAll('.card-wrapper').forEach(el => el.classList.remove('opened'));
+            // Xáo trộn ngẫu nhiên phần quà
+            rewards.sort(() => Math.random() - 0.5);
+        }
+
+        // Tùy chỉnh danh sách quà
+        function editRewards() {
+            const input = prompt("Nhập danh sách đặc quyền (phân cách bằng dấu phẩy):", 
+                rewards.map(r => r.text).join(", ")
+            );
+            if (input) {
+                const arr = input.split(",").map(t => t.trim()).filter(t => t.length > 0);
+                if (arr.length > 0) {
+                    rewards = arr.map(text => ({ text: text, icon: "🎉" }));
+                    renderCards();
+                }
+            }
+        }
+
+        // Khởi tạo lần đầu
+        renderCards();
+    </script>
+</body>
+</html>
