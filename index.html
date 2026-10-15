@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thẻ Đặc Quyền - Quỹ Đạo Elip Vũ Trụ</title>
+    <title>Thẻ Đặc Quyền - Linh Thú 3D Vũ Trụ</title>
     <!-- Pháo hoa Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 
         body {
             font-family: 'Mali', cursive, sans-serif;
-            background: radial-gradient(circle at center, #24143d 0%, #080511 100%);
+            background: radial-gradient(circle at center, #2b134d 0%, #0a0515 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -29,7 +29,7 @@
             color: #fff;
         }
 
-        /* Banner tiêu đề */
+        /* Banner tiêu đề phong cách Cute Magic */
         .title-banner {
             background: linear-gradient(90deg, #ff0844 0%, #ffb199 100%);
             color: #fff;
@@ -43,9 +43,15 @@
             margin-bottom: 10px;
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            animation: bannerFloat 3s ease-in-out infinite alternate;
         }
 
-        /* Sân khấu 3D lơ lửng trên không */
+        @keyframes bannerFloat {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        /* Sân khấu 3D lơ lửng trên không trung */
         .arena-container {
             position: relative;
             width: 100vw;
@@ -60,8 +66,8 @@
         /* Thẻ bao ngoài */
         .card-wrapper {
             position: absolute;
-            width: 175px;
-            height: 235px;
+            width: 180px;
+            height: 245px;
             perspective: 1200px;
             cursor: pointer;
             transition: opacity 0.5s ease, filter 0.3s;
@@ -73,7 +79,7 @@
             position: relative;
             width: 100%;
             height: 100%;
-            border-radius: 22px;
+            border-radius: 24px;
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
         }
@@ -82,25 +88,27 @@
             transform: rotateY(180deg);
         }
 
-        /* Hai mặt thẻ */
+        /* Mặt thẻ */
         .card-face {
             position: absolute;
             width: 100%;
             height: 100%;
-            border-radius: 22px;
+            border-radius: 24px;
             backface-visibility: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            padding: 16px 12px;
             border: 3px solid rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 18px rgba(255, 117, 140, 0.5), 0 10px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 0 20px rgba(255, 117, 140, 0.5), 0 10px 25px rgba(0,0,0,0.4);
         }
 
-        /* Mặt úp */
+        /* Mặt úp: Linh thú 3D hoạt hình sống động */
         .card-back {
-            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 100%);
+            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 50%, #7afcff 100%);
             animation: auraPulse 2.5s infinite alternate ease-in-out;
+            overflow: hidden;
         }
 
         @keyframes auraPulse {
@@ -108,10 +116,55 @@
             100% { box-shadow: 0 0 30px rgba(255, 75, 43, 0.9), 0 0 55px rgba(255, 140, 0, 0.7); }
         }
 
-        .card-badge {
-            font-size: 3.3rem;
-            margin-bottom: 6px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+        /* Khung chứa ảnh linh thú 3D */
+        .animal-avatar-container {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        /* Vòng hào quang thiên thần xoay quanh linh thú */
+        .animal-halo {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            animation: rotateHalo 6s linear infinite;
+        }
+
+        @keyframes rotateHalo {
+            0% { transform: rotate(0deg) scale(0.95); }
+            50% { transform: rotate(180deg) scale(1.08); }
+            100% { transform: rotate(360deg) scale(0.95); }
+        }
+
+        /* Ảnh con vật 3D */
+        .animal-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.35));
+            animation: animalFloat 2.6s ease-in-out infinite alternate;
+            z-index: 2;
+        }
+
+        @keyframes animalFloat {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-8px) rotate(3deg) scale(1.05); }
+            100% { transform: translateY(4px) rotate(-3deg) scale(0.98); }
+        }
+
+        .animal-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffe600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
         }
 
         .card-label {
@@ -130,15 +183,16 @@
             background: linear-gradient(145deg, #ffffff 0%, #fff0f5 100%);
             color: #333;
             transform: rotateY(180deg);
-            padding: 15px;
+            padding: 20px 15px;
             text-align: center;
             border: 4px solid #ff477e;
             box-shadow: 0 0 35px #ffe600, 0 0 60px #ff7b00;
+            justify-content: center;
+            gap: 12px;
         }
 
         .card-front .reward-icon {
-            font-size: 3.8rem;
-            margin-bottom: 8px;
+            font-size: 4.2rem;
             animation: bounceIcon 1s infinite alternate;
         }
 
@@ -148,27 +202,27 @@
         }
 
         .card-front .reward-title {
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: #d63384;
             line-height: 1.35;
         }
 
-        /* Hào quang khi hệ thống khóa mục tiêu chọn */
+        /* Hiệu ứng khóa mục tiêu ngẫu nhiên */
         .card-wrapper.targeted {
-            filter: brightness(1.3);
-            box-shadow: 0 0 45px #00f2fe, 0 0 70px #4facfe !important;
+            filter: brightness(1.35);
+            box-shadow: 0 0 45px #00f2fe, 0 0 80px #4facfe !important;
             z-index: 400 !important;
         }
 
         /* Thẻ được chọn phóng to ra giữa màn hình */
         .card-wrapper.focus-center {
             z-index: 500 !important;
-            transform: translate(0px, 0px) scale(1.45) !important;
+            transform: translate(0px, 0px) scale(1.48) !important;
             transition: transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
         }
 
-        /* Thẻ bị loại trừ (Eliminate) */
+        /* Thẻ bị loại trừ */
         .card-wrapper.eliminated {
             transform: scale(0) rotate(180deg) !important;
             opacity: 0 !important;
@@ -234,7 +288,7 @@
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.78);
             display: none;
             justify-content: center;
             align-items: center;
@@ -391,7 +445,7 @@
 </head>
 <body>
 
-    <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LỚP HỌC ⭐</div>
+    <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LINH THÚ 3D ⭐</div>
 
     <!-- Sân khấu Quỹ đạo Elip -->
     <div class="arena-container" id="arena"></div>
@@ -432,6 +486,18 @@
     </div>
 
     <script>
+        // Danh sách 8 Bé Thú 3D Cute Fluent 3D
+        const animalList = [
+            { name: "Gấu Trúc 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Panda.png" },
+            { name: "Mèo Thần Tài 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Cat%20Face.png" },
+            { name: "Kỳ Lân Mộng Mơ", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Unicorn.png" },
+            { name: "Rồng Con May Mắn", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Dragon%20Face.png" },
+            { name: "Khủng Long Tí Nị", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sauropod.png" },
+            { name: "Cún Corgi Vui Vẻ", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Dog%20Face.png" },
+            { name: "Thỏ Bảy Màu 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Rabbit%20Face.png" },
+            { name: "Chim Cánh Cụt Cute", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Penguin.png" }
+        ];
+
         const defaultRewards = [
             { text: "Được làm Lớp Trưởng trong 1 tuần!", icon: "👑" },
             { text: "Miễn 1 lần kiểm tra bài cũ / bài tập!", icon: "📜" },
@@ -447,12 +513,12 @@
         let eliminatedCards = new Set();
         let currentChosenIndex = null;
         let isAnimating = false;
-        let currentBaseAngle = 0; // Lưu góc xoay hiện tại để thẻ luôn đứng yên ở vị trí elip
+        let currentBaseAngle = 0;
 
         const arena = document.getElementById('arena');
         const startBtn = document.getElementById('startBtn');
 
-        // Âm thanh Web Audio
+        // Âm thanh sống động
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playWhooshSound() {
@@ -502,7 +568,7 @@
             });
         }
 
-        // Bán kính elip siêu rộng
+        // Bán kính Elip
         function getEllipseRadii() {
             const maxArenaWidth = Math.min(window.innerWidth - 60, 1300);
             return {
@@ -511,7 +577,7 @@
             };
         }
 
-        // Cập nhật vị trí thẻ theo quỹ đạo elip lơ lửng trên không trung
+        // Cập nhật vị trí thẻ lơ lửng trên không trung elip
         function updateCardsOnEllipse(baseAngle) {
             const { rx, ry } = getEllipseRadii();
             const activeIndices = [];
@@ -532,7 +598,6 @@
                 const x = cosA * rx;
                 const y = sinA * ry;
 
-                // Chiều sâu 3D
                 const depthFactor = (sinA + 1) / 2;
                 const scale = 0.72 + depthFactor * 0.38;
                 const zIndex = Math.round(50 + depthFactor * 100);
@@ -544,20 +609,28 @@
             });
         }
 
-        // Khởi tạo các thẻ ban đầu lơ lửng luôn trên quỹ đạo elip
+        // Khởi tạo thẻ với linh thú 3D hoạt hình
         function initCards() {
             arena.innerHTML = '';
             rewards.forEach((item, index) => {
+                const animal = animalList[index % animalList.length];
                 const wrapper = document.createElement('div');
                 wrapper.className = 'card-wrapper';
                 wrapper.id = `card-wrap-${index}`;
 
                 wrapper.innerHTML = `
                     <div class="card-inner">
+                        <!-- Mặt sau: Bé thú 3D Animation -->
                         <div class="card-face card-back">
-                            <div class="card-badge">🧧</div>
+                            <div class="animal-avatar-container">
+                                <div class="animal-halo"></div>
+                                <img src="${animal.img}" alt="${animal.name}" class="animal-img" loading="lazy">
+                            </div>
+                            <div class="animal-name">${animal.name}</div>
                             <div class="card-label">Thẻ số ${index + 1}</div>
                         </div>
+
+                        <!-- Mặt trước: Quà tặng Flip 3D -->
                         <div class="card-face card-front">
                             <div class="reward-icon">${item.icon}</div>
                             <div class="reward-title">${item.text}</div>
@@ -565,7 +638,7 @@
                     </div>
                 `;
 
-                // Vẫn hỗ trợ nếu giáo viên hoặc học sinh muốn chạm tay chọn trực tiếp
+                // Vẫn hỗ trợ click tay chọn thẻ tức thì
                 wrapper.onclick = () => {
                     if (!isAnimating && !eliminatedCards.has(index)) {
                         pickAndRevealCard(index);
@@ -578,7 +651,7 @@
             updateCardsOnEllipse(currentBaseAngle);
         }
 
-        // ================= QUAY SHUFFLE & TỰ ĐỘNG CHỌN THẺ =================
+        // ================= QUAY SHUFFLE & TỰ ĐỘNG CHỌN =================
         function startShuffleAndAutoPick() {
             if (isAnimating) return;
 
@@ -592,7 +665,6 @@
                 return;
             }
 
-            // Nếu chỉ còn 1 thẻ duy nhất
             if (activeIndices.length === 1) {
                 pickAndRevealCard(activeIndices[0]);
                 return;
@@ -602,50 +674,46 @@
             startBtn.disabled = true;
 
             const startTime = performance.now();
-            const duration = 2800; // Quay trong 2.8 giây
+            const duration = 2800; // 2.8s
             const initialAngle = currentBaseAngle;
-            const totalRotation = Math.PI * 6; // Xoay 3 vòng hoàn chỉnh
+            const totalRotation = Math.PI * 6; // 3 vòng
             let lastAudio = 0;
 
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
 
-                // Hiệu ứng giảm tốc mượt mà (Cubic Ease-Out)
+                // Giảm tốc mượt mà
                 const easeOutProgress = 1 - Math.pow(1 - progress, 3);
                 currentBaseAngle = initialAngle + easeOutProgress * totalRotation;
 
-                // Âm thanh vút theo độ quay
                 if (elapsed - lastAudio > 120 + progress * 160) {
                     playWhooshSound();
                     lastAudio = elapsed;
                 }
 
-                // Cập nhật vị trí các thẻ trên elip theo thời gian thực
                 updateCardsOnEllipse(currentBaseAngle);
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // Dừng lại: TẤT CẢ CÁC THẺ VẪN NẰM YÊN TRÊN ELIP
-                    // Hệ thống tự động chọn 1 thẻ ngẫu nhiên trong số thẻ còn lại
+                    // Dừng quay: TẤT CẢ THẺ VẪN NẰM NGUYÊN TRÊN ELIP KHÔNG TRUNG
                     const chosenIndex = activeIndices[Math.floor(Math.random() * activeIndices.length)];
                     const chosenEl = document.getElementById(`card-wrap-${chosenIndex}`);
 
-                    // Khóa mục tiêu với viền hào quang neon
                     chosenEl.classList.add('targeted');
 
                     setTimeout(() => {
                         chosenEl.classList.remove('targeted');
                         pickAndRevealCard(chosenIndex);
-                    }, 600);
+                    }, 650);
                 }
             }
 
             requestAnimationFrame(animate);
         }
 
-        // Tự động Flip thẻ và phóng to nhận quà
+        // Tự động Flip thẻ và phóng to
         function pickAndRevealCard(index) {
             isAnimating = true;
             startBtn.disabled = true;
@@ -653,17 +721,15 @@
 
             const el = document.getElementById(`card-wrap-${index}`);
 
-            // Thẻ được chọn tách khỏi elip và bay ra tâm màn hình
             el.classList.add('focus-center');
             playFlipSound();
 
-            // Tự động lật mặt thẻ (Flip 3D) sau 0.25s
             setTimeout(() => {
                 el.classList.add('flipped');
                 playVictorySound();
 
                 confetti({
-                    particleCount: 95,
+                    particleCount: 100,
                     spread: 90,
                     origin: { y: 0.55 }
                 });
@@ -676,8 +742,7 @@
             }, 300);
         }
 
-        // Đóng modal, tự động loại trừ (Eliminate) thẻ vừa mở
-        // Các thẻ còn lại vẫn giữ nguyên vị trí lơ lửng trên elip
+        // Đóng quà và tự động Eliminate thẻ vừa mở
         function closeReward() {
             document.getElementById('rewardModal').classList.remove('active');
 
@@ -691,14 +756,14 @@
                 currentChosenIndex = null;
             }
 
-            // Cập nhật lại các thẻ còn lại chia đều trên quỹ đạo elip mà không bị giật
+            // Chia đều lại các thẻ còn lại trên elip
             updateCardsOnEllipse(currentBaseAngle);
 
             isAnimating = false;
             startBtn.disabled = false;
         }
 
-        // Đặt lại toàn bộ trò chơi
+        // Đặt lại game
         function resetGame() {
             if (isAnimating) return;
             eliminatedCards.clear();
@@ -752,14 +817,13 @@
             resetGame();
         }
 
-        // Tự động căn lại elip nếu đổi kích thước màn hình
         window.addEventListener('resize', () => {
             if (!isAnimating) {
                 updateCardsOnEllipse(currentBaseAngle);
             }
         });
 
-        // Khởi động
+        // Khởi tạo
         initCards();
     </script>
 </body>
