@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thẻ Đặc Quyền Lớp Học - Quỹ Đạo Trái Đất</title>
+    <title>Thẻ Đặc Quyền - Quỹ Đạo Elip Vũ Trụ</title>
     <!-- Pháo hoa Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 
         body {
             font-family: 'Mali', cursive, sans-serif;
-            background: radial-gradient(circle at center, #1e1136 0%, #07040d 100%);
+            background: radial-gradient(circle at center, #24143d 0%, #080511 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -40,17 +40,17 @@
             text-transform: uppercase;
             box-shadow: 0 0 25px rgba(255, 8, 68, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2);
             border: 4px solid #fff;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
         }
 
-        /* Sân khấu xoay vũ trụ siêu rộng */
+        /* Sân khấu 3D lơ lửng trên không */
         .arena-container {
             position: relative;
             width: 100vw;
             max-width: 1350px;
-            height: 540px;
+            height: 560px;
             perspective: 1600px;
             display: flex;
             justify-content: center;
@@ -82,7 +82,7 @@
             transform: rotateY(180deg);
         }
 
-        /* Mặt thẻ */
+        /* Hai mặt thẻ */
         .card-face {
             position: absolute;
             width: 100%;
@@ -154,14 +154,21 @@
             line-height: 1.35;
         }
 
-        /* Phóng to trọng tâm */
+        /* Hào quang khi hệ thống khóa mục tiêu chọn */
+        .card-wrapper.targeted {
+            filter: brightness(1.3);
+            box-shadow: 0 0 45px #00f2fe, 0 0 70px #4facfe !important;
+            z-index: 400 !important;
+        }
+
+        /* Thẻ được chọn phóng to ra giữa màn hình */
         .card-wrapper.focus-center {
             z-index: 500 !important;
             transform: translate(0px, 0px) scale(1.45) !important;
-            transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+            transition: transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
         }
 
-        /* Thẻ bị loại trừ */
+        /* Thẻ bị loại trừ (Eliminate) */
         .card-wrapper.eliminated {
             transform: scale(0) rotate(180deg) !important;
             opacity: 0 !important;
@@ -194,13 +201,7 @@
             gap: 8px;
         }
 
-        .btn-shuffle {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            color: #5c2c00;
-            border: 2px solid #fff;
-        }
-
-        .btn-random {
+        .btn-start {
             background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
             color: #fff;
             border: 2px solid #fff;
@@ -392,16 +393,13 @@
 
     <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LỚP HỌC ⭐</div>
 
-    <!-- Sân khấu Elip Trái Đất -->
+    <!-- Sân khấu Quỹ đạo Elip -->
     <div class="arena-container" id="arena"></div>
 
     <!-- Nút điều khiển -->
     <div class="controls">
-        <button class="btn btn-shuffle" id="shuffleBtn" onclick="startEarthOrbitShuffle()">
-            🌍 Vòng Xoay Trái Đất
-        </button>
-        <button class="btn btn-random" id="randomBtn" onclick="shuffleAndPickRandom()">
-            🎯 Shuffle & Chọn Thẻ
+        <button class="btn btn-start" id="startBtn" onclick="startShuffleAndAutoPick()">
+            🚀 Bắt Đầu Quay & Chọn Thẻ
         </button>
         <button class="btn btn-reset" onclick="resetGame()">
             🔄 Đặt Lại Trò Chơi
@@ -449,12 +447,12 @@
         let eliminatedCards = new Set();
         let currentChosenIndex = null;
         let isAnimating = false;
+        let currentBaseAngle = 0; // Lưu góc xoay hiện tại để thẻ luôn đứng yên ở vị trí elip
 
         const arena = document.getElementById('arena');
-        const shuffleBtn = document.getElementById('shuffleBtn');
-        const randomBtn = document.getElementById('randomBtn');
+        const startBtn = document.getElementById('startBtn');
 
-        // Âm thanh
+        // Âm thanh Web Audio
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playWhooshSound() {
@@ -462,8 +460,8 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(170, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(750, audioCtx.currentTime + 0.12);
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.12);
             gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
             osc.connect(gain);
@@ -477,8 +475,8 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.2);
+            osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1050, audioCtx.currentTime + 0.2);
             gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
             osc.connect(gain);
@@ -504,23 +502,49 @@
             });
         }
 
-        // Tọa độ lưới ban đầu (chia đều hàng lối rộng rãi)
-        function getGridPosition(index) {
-            const cardW = 175, cardH = 235, gapX = 45, gapY = 30;
-            const cols = 4;
-            const row = Math.floor(index / cols);
-            const col = index % cols;
-
-            const totalW = cols * cardW + (cols - 1) * gapX;
-            const startX = -totalW / 2 + cardW / 2;
-            const startY = - (2 * cardH + gapY) / 2 + cardH / 2;
-
-            const x = startX + col * (cardW + gapX);
-            const y = startY + row * (cardH + gapY);
-            return { x, y };
+        // Bán kính elip siêu rộng
+        function getEllipseRadii() {
+            const maxArenaWidth = Math.min(window.innerWidth - 60, 1300);
+            return {
+                rx: Math.max(maxArenaWidth * 0.44, 450),
+                ry: 180
+            };
         }
 
-        // Khởi tạo các thẻ
+        // Cập nhật vị trí thẻ theo quỹ đạo elip lơ lửng trên không trung
+        function updateCardsOnEllipse(baseAngle) {
+            const { rx, ry } = getEllipseRadii();
+            const activeIndices = [];
+            rewards.forEach((_, idx) => {
+                if (!eliminatedCards.has(idx) && idx !== currentChosenIndex) {
+                    activeIndices.push(idx);
+                }
+            });
+
+            activeIndices.forEach((cardIdx, i) => {
+                const el = document.getElementById(`card-wrap-${cardIdx}`);
+                if (!el) return;
+
+                const angle = baseAngle + (i / activeIndices.length) * Math.PI * 2;
+                const cosA = Math.cos(angle);
+                const sinA = Math.sin(angle);
+
+                const x = cosA * rx;
+                const y = sinA * ry;
+
+                // Chiều sâu 3D
+                const depthFactor = (sinA + 1) / 2;
+                const scale = 0.72 + depthFactor * 0.38;
+                const zIndex = Math.round(50 + depthFactor * 100);
+                const tiltAngle = -cosA * 12;
+
+                el.style.zIndex = zIndex;
+                el.style.opacity = 0.55 + depthFactor * 0.45;
+                el.style.transform = `translate(${x}px, ${y}px) rotate(${tiltAngle}deg) scale(${scale})`;
+            });
+        }
+
+        // Khởi tạo các thẻ ban đầu lơ lửng luôn trên quỹ đạo elip
         function initCards() {
             arena.innerHTML = '';
             rewards.forEach((item, index) => {
@@ -541,10 +565,7 @@
                     </div>
                 `;
 
-                const pos = getGridPosition(index);
-                wrapper.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
-                
-                // Nhấp chọn tức thì không rung lắc
+                // Vẫn hỗ trợ nếu giáo viên hoặc học sinh muốn chạm tay chọn trực tiếp
                 wrapper.onclick = () => {
                     if (!isAnimating && !eliminatedCards.has(index)) {
                         pickAndRevealCard(index);
@@ -553,15 +574,12 @@
 
                 arena.appendChild(wrapper);
             });
+
+            updateCardsOnEllipse(currentBaseAngle);
         }
 
-        function setButtonsDisabled(state) {
-            shuffleBtn.disabled = state;
-            randomBtn.disabled = state;
-        }
-
-        // ================= XÁO THẺ QUỸ ĐẠO TRÁI ĐẤT SIÊU RỘNG =================
-        function startEarthOrbitShuffle(callback = null) {
+        // ================= QUAY SHUFFLE & TỰ ĐỘNG CHỌN THẺ =================
+        function startShuffleAndAutoPick() {
             if (isAnimating) return;
 
             const activeIndices = [];
@@ -569,114 +587,84 @@
                 if (!eliminatedCards.has(idx)) activeIndices.push(idx);
             });
 
-            if (activeIndices.length <= 1) {
-                if (callback) callback();
+            if (activeIndices.length === 0) {
+                alert("Tất cả thẻ đã được mở hết! Nhấn 'Đặt Lại Trò Chơi' để chơi ván mới nhé.");
+                return;
+            }
+
+            // Nếu chỉ còn 1 thẻ duy nhất
+            if (activeIndices.length === 1) {
+                pickAndRevealCard(activeIndices[0]);
                 return;
             }
 
             isAnimating = true;
-            setButtonsDisabled(true);
-
-            // Tự động căn chỉnh bán kính theo chiều ngang màn hình:
-            // rx siêu rộng (lên tới 560px - 620px), ry dẹp hình đĩa Trái Đất (170px)
-            const maxArenaWidth = Math.min(window.innerWidth - 60, 1300);
-            const rx = Math.max(maxArenaWidth * 0.42, 420);
-            const ry = 175; 
+            startBtn.disabled = true;
 
             const startTime = performance.now();
-            const duration = 2400; // Xoay 2.4s
+            const duration = 2800; // Quay trong 2.8 giây
+            const initialAngle = currentBaseAngle;
+            const totalRotation = Math.PI * 6; // Xoay 3 vòng hoàn chỉnh
             let lastAudio = 0;
 
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
 
-                if (elapsed - lastAudio > 130) {
+                // Hiệu ứng giảm tốc mượt mà (Cubic Ease-Out)
+                const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+                currentBaseAngle = initialAngle + easeOutProgress * totalRotation;
+
+                // Âm thanh vút theo độ quay
+                if (elapsed - lastAudio > 120 + progress * 160) {
                     playWhooshSound();
                     lastAudio = elapsed;
                 }
 
-                // Quay 3 vòng tròn
-                const baseAngle = progress * Math.PI * 6;
-
-                activeIndices.forEach((cardIdx, i) => {
-                    const el = document.getElementById(`card-wrap-${cardIdx}`);
-                    if (!el) return;
-
-                    // Góc phân bố đều quanh quỹ đạo
-                    const angle = baseAngle + (i / activeIndices.length) * Math.PI * 2;
-                    const cosA = Math.cos(angle);
-                    const sinA = Math.sin(angle);
-
-                    const x = cosA * rx;
-                    const y = sinA * ry;
-
-                    // Chiều sâu 3D quỹ đạo Trái Đất:
-                    // Thẻ ở nửa dưới (phía trước) thì phóng to + ưu tiên z-index
-                    // Thẻ ở nửa trên (phía sau) thì nhỏ lại và hơi mờ
-                    const depthFactor = (sinA + 1) / 2; // từ 0 (xa nhất) đến 1 (gần nhất)
-                    const scale = 0.72 + depthFactor * 0.38; // từ 0.72 đến 1.1
-                    const zIndex = Math.round(50 + depthFactor * 100);
-                    const tiltAngle = -cosA * 12; // Nghiêng tiếp tuyến theo quỹ đạo
-
-                    el.style.zIndex = zIndex;
-                    el.style.opacity = 0.55 + depthFactor * 0.45;
-                    el.style.transform = `translate(${x}px, ${y}px) rotate(${tiltAngle}deg) scale(${scale})`;
-                });
+                // Cập nhật vị trí các thẻ trên elip theo thời gian thực
+                updateCardsOnEllipse(currentBaseAngle);
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // Xoay xong: Hoàn tất trạng thái, trả về lưới rộng rãi
+                    // Dừng lại: TẤT CẢ CÁC THẺ VẪN NẰM YÊN TRÊN ELIP
+                    // Hệ thống tự động chọn 1 thẻ ngẫu nhiên trong số thẻ còn lại
+                    const chosenIndex = activeIndices[Math.floor(Math.random() * activeIndices.length)];
+                    const chosenEl = document.getElementById(`card-wrap-${chosenIndex}`);
+
+                    // Khóa mục tiêu với viền hào quang neon
+                    chosenEl.classList.add('targeted');
+
                     setTimeout(() => {
-                        activeIndices.forEach((cardIdx) => {
-                            const el = document.getElementById(`card-wrap-${cardIdx}`);
-                            if (!el) return;
-                            el.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.4s';
-                            el.style.opacity = 1;
-                            el.style.zIndex = 10;
-                            const pos = getGridPosition(cardIdx);
-                            el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(0deg) scale(1)`;
-                        });
-
-                        setTimeout(() => {
-                            activeIndices.forEach((cardIdx) => {
-                                const el = document.getElementById(`card-wrap-${cardIdx}`);
-                                if (el) el.style.transition = '';
-                            });
-                            isAnimating = false;
-                            setButtonsDisabled(false);
-
-                            if (callback) callback();
-                        }, 600);
-                    }, 200);
+                        chosenEl.classList.remove('targeted');
+                        pickAndRevealCard(chosenIndex);
+                    }, 600);
                 }
             }
 
             requestAnimationFrame(animate);
         }
 
-        // Chọn và Lật Thẻ
+        // Tự động Flip thẻ và phóng to nhận quà
         function pickAndRevealCard(index) {
-            if (isAnimating || eliminatedCards.has(index)) return;
             isAnimating = true;
-            setButtonsDisabled(true);
+            startBtn.disabled = true;
             currentChosenIndex = index;
 
             const el = document.getElementById(`card-wrap-${index}`);
 
-            // Bay ra tâm màn hình
+            // Thẻ được chọn tách khỏi elip và bay ra tâm màn hình
             el.classList.add('focus-center');
             playFlipSound();
 
-            // Tự động lật mặt Flip sau 0.25s
+            // Tự động lật mặt thẻ (Flip 3D) sau 0.25s
             setTimeout(() => {
                 el.classList.add('flipped');
                 playVictorySound();
 
                 confetti({
-                    particleCount: 90,
-                    spread: 85,
+                    particleCount: 95,
+                    spread: 90,
                     origin: { y: 0.55 }
                 });
 
@@ -688,29 +676,8 @@
             }, 300);
         }
 
-        // Shuffle xoay tròn rồi tự động chọn
-        function shuffleAndPickRandom() {
-            if (isAnimating) return;
-
-            const available = [];
-            rewards.forEach((_, idx) => {
-                if (!eliminatedCards.has(idx)) available.push(idx);
-            });
-
-            if (available.length === 0) {
-                alert("Tất cả thẻ đã được mở hết rồi! Nhấn 'Đặt Lại Trò Chơi' để bắt đầu vòng mới.");
-                return;
-            }
-
-            startEarthOrbitShuffle(() => {
-                const randomChoice = available[Math.floor(Math.random() * available.length)];
-                setTimeout(() => {
-                    pickAndRevealCard(randomChoice);
-                }, 150);
-            });
-        }
-
-        // Đóng quà và tự động loại trừ (Eliminate) thẻ
+        // Đóng modal, tự động loại trừ (Eliminate) thẻ vừa mở
+        // Các thẻ còn lại vẫn giữ nguyên vị trí lơ lửng trên elip
         function closeReward() {
             document.getElementById('rewardModal').classList.remove('active');
 
@@ -724,21 +691,27 @@
                 currentChosenIndex = null;
             }
 
+            // Cập nhật lại các thẻ còn lại chia đều trên quỹ đạo elip mà không bị giật
+            updateCardsOnEllipse(currentBaseAngle);
+
             isAnimating = false;
-            setButtonsDisabled(false);
+            startBtn.disabled = false;
         }
 
-        // Đặt lại trò chơi
+        // Đặt lại toàn bộ trò chơi
         function resetGame() {
             if (isAnimating) return;
             eliminatedCards.clear();
             currentChosenIndex = null;
+            currentBaseAngle = 0;
+
             document.querySelectorAll('.card-wrapper').forEach(el => {
                 el.className = 'card-wrapper';
                 el.style.opacity = 1;
-                el.style.zIndex = 10;
             });
-            startEarthOrbitShuffle();
+
+            updateCardsOnEllipse(currentBaseAngle);
+            startShuffleAndAutoPick();
         }
 
         // ================= CÀI ĐẶT PHẦN THƯỞNG =================
@@ -779,7 +752,14 @@
             resetGame();
         }
 
-        // Khởi tạo ban đầu
+        // Tự động căn lại elip nếu đổi kích thước màn hình
+        window.addEventListener('resize', () => {
+            if (!isAnimating) {
+                updateCardsOnEllipse(currentBaseAngle);
+            }
+        });
+
+        // Khởi động
         initCards();
     </script>
 </body>
