@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thẻ Đặc Quyền - Hào Quang & Shuffle Ngẫu Nhiên</title>
+    <title>Thẻ Đặc Quyền Lớp Học</title>
     <!-- Pháo hoa Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&display=swap" rel="stylesheet">
@@ -13,11 +13,12 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Mali', cursive, sans-serif;
-            background: radial-gradient(circle at center, #2e1a47 0%, #0f0c1b 100%);
+            background: radial-gradient(circle at center, #231338 0%, #0d0914 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -32,9 +33,9 @@
         .title-banner {
             background: linear-gradient(90deg, #ff0844 0%, #ffb199 100%);
             color: #fff;
-            padding: 12px 45px;
+            padding: 10px 45px;
             border-radius: 50px;
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: 700;
             text-transform: uppercase;
             box-shadow: 0 0 25px rgba(255, 8, 68, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2);
@@ -44,77 +45,73 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
         }
 
-        /* Khu vực sân khấu hiển thị thẻ */
+        /* Sân khấu 3D */
         .arena-container {
             position: relative;
             width: 100%;
-            max-width: 1050px;
+            max-width: 1100px;
             height: 520px;
-            perspective: 1200px;
+            perspective: 1400px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Thẻ bài cùng hiệu ứng hào quang Aura Glow */
-        .card {
+        /* Vỏ bao ngoài để giữ tọa độ di chuyển cố định, chống giật khi hover/click */
+        .card-wrapper {
             position: absolute;
             width: 190px;
-            height: 240px;
+            height: 250px;
+            perspective: 1000px;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.5s ease;
+        }
+
+        /* Khối lật 3D (Flip Card) */
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
             border-radius: 24px;
-            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 100%);
-            border: 3px solid rgba(255, 255, 255, 0.9);
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .card-wrapper.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Mặt thẻ chung */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            backface-visibility: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-            transform-origin: center center;
-            z-index: 10;
-            /* Hiệu ứng hào quang tỏa sáng liên tục */
-            box-shadow: 0 0 15px rgba(255, 117, 140, 0.5), 
-                        0 0 30px rgba(255, 126, 179, 0.3);
-            animation: pulseAura 2.5s infinite alternate ease-in-out;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(255, 117, 140, 0.5), 0 10px 25px rgba(0,0,0,0.4);
         }
 
-        @keyframes pulseAura {
-            0% {
-                box-shadow: 0 0 15px rgba(255, 117, 140, 0.6), 0 0 30px rgba(255, 126, 179, 0.4);
-            }
-            100% {
-                box-shadow: 0 0 28px rgba(255, 75, 43, 0.9), 0 0 50px rgba(255, 140, 0, 0.6);
-            }
+        /* Mặt úp (Mặt lưng) */
+        .card-back {
+            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 100%);
+            animation: auraPulse 2.5s infinite alternate ease-in-out;
         }
 
-        .card:hover:not(.shuffling):not(.opened) {
-            transform: scale(1.08) translateY(-10px) !important;
-            box-shadow: 0 0 35px #00f2fe, 0 0 60px #4facfe !important;
-            border-color: #fff;
-            z-index: 50;
-        }
-
-        /* Hào quang rực lửa khi được chọn ngẫu nhiên */
-        .card.spotlight {
-            box-shadow: 0 0 45px #ffe600, 0 0 80px #ff7b00 !important;
-            border-color: #ffe600 !important;
-            z-index: 60 !important;
-            transform: scale(1.15) !important;
-        }
-
-        .card.opened {
-            opacity: 0.3;
-            filter: grayscale(1);
-            cursor: not-allowed;
-            pointer-events: none;
-            box-shadow: none !important;
-            animation: none !important;
+        @keyframes auraPulse {
+            0% { box-shadow: 0 0 15px rgba(255, 117, 140, 0.6), 0 0 30px rgba(255, 126, 179, 0.4); }
+            100% { box-shadow: 0 0 28px rgba(255, 75, 43, 0.9), 0 0 50px rgba(255, 140, 0, 0.6); }
         }
 
         .card-badge {
-            font-size: 3.6rem;
+            font-size: 3.5rem;
             margin-bottom: 8px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
         }
 
         .card-label {
@@ -125,10 +122,52 @@
             padding: 6px 18px;
             border-radius: 30px;
             border: 2px dashed #d63384;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        /* Thanh điều khiển */
+        /* Mặt ngửa (Lộ phần thưởng) */
+        .card-front {
+            background: linear-gradient(145deg, #fff 0%, #fff0f5 100%);
+            color: #333;
+            transform: rotateY(180deg);
+            padding: 15px;
+            text-align: center;
+            border: 4px solid #ff477e;
+            box-shadow: 0 0 30px #ffe600, 0 0 50px #ff7b00;
+        }
+
+        .card-front .reward-icon {
+            font-size: 3.8rem;
+            margin-bottom: 8px;
+            animation: bounceIcon 1s infinite alternate;
+        }
+
+        @keyframes bounceIcon {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
+        }
+
+        .card-front .reward-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #d63384;
+            line-height: 1.35;
+        }
+
+        /* Trạng thái phóng to giữa màn hình */
+        .card-wrapper.focus-center {
+            z-index: 200 !important;
+            transform: translate(0px, 0px) scale(1.4) !important;
+        }
+
+        /* Trạng thái bị loại trừ (Eliminated) */
+        .card-wrapper.eliminated {
+            transform: scale(0) rotate(180deg) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Nút điều khiển */
         .controls {
             margin-top: 25px;
             display: flex;
@@ -165,16 +204,16 @@
             border: 2px solid #fff;
         }
 
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+        }
+
         .btn-config {
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        .btn-reset {
-            background: rgba(255, 255, 255, 0.85);
-            color: #333;
         }
 
         .btn:hover:not(:disabled) {
@@ -188,7 +227,7 @@
             transform: none !important;
         }
 
-        /* Pop-up Thưởng lớn */
+        /* Modal Quà Nhận Được */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -277,7 +316,7 @@
             background: #40c057;
         }
 
-        /* Modal Chỉnh Sửa Phần Thưởng */
+        /* Modal Cài Đặt */
         .config-modal-card {
             background: #251d38;
             color: #fff;
@@ -289,7 +328,6 @@
             display: flex;
             flex-direction: column;
             border: 3px solid #7952b3;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
 
         .config-header {
@@ -355,23 +393,23 @@
     <!-- Sân khấu thẻ -->
     <div class="arena-container" id="arena"></div>
 
-    <!-- Thanh công cụ điều khiển -->
+    <!-- Nút điều khiển -->
     <div class="controls">
-        <button class="btn btn-shuffle" id="shuffleBtn" onclick="startCircularShuffle()">
-            🌪️ Xáo Tròn
+        <button class="btn btn-shuffle" id="shuffleBtn" onclick="startEllipseShuffle()">
+            🌪️ Xáo Tròn Elip
         </button>
         <button class="btn btn-random" id="randomBtn" onclick="shuffleAndPickRandom()">
             🎯 Shuffle & Chọn Thẻ
         </button>
         <button class="btn btn-reset" onclick="resetGame()">
-            🔄 Đặt Lại
+            🔄 Đặt Lại Trò Chơi
         </button>
         <button class="btn btn-config" onclick="openConfigModal()">
             ⚙️ Cài Đặt Quà
         </button>
     </div>
 
-    <!-- Modal Xem Phần Thưởng Nhận Được -->
+    <!-- Modal Chi Tiết Quà -->
     <div class="modal" id="rewardModal">
         <div class="modal-card">
             <div class="modal-header-tag">✨ ĐẶC QUYỀN CỦA EM ✨</div>
@@ -381,20 +419,19 @@
         </div>
     </div>
 
-    <!-- Modal Cấu Hình Phần Thưởng -->
+    <!-- Modal Chỉnh Sửa Quà -->
     <div class="modal" id="configModal">
         <div class="config-modal-card">
             <div class="config-header">⚙️ Danh Sách Đặc Quyền Của Lớp</div>
             <div class="config-list" id="configList"></div>
             <div class="config-footer">
                 <button class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
-                <button class="btn btn-claim" onclick="saveConfig()">Lưu Thay Đổi</button>
+                <button class="btn btn-claim" onclick="saveConfig()">Lưu Lại</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Mảng dữ liệu phần thưởng (Lưu mặc định vào localStorage nếu có chỉnh sửa)
         const defaultRewards = [
             { text: "Được làm Lớp Trưởng trong 1 tuần!", icon: "👑" },
             { text: "Miễn 1 lần kiểm tra bài cũ / bài tập!", icon: "📜" },
@@ -407,13 +444,15 @@
         ];
 
         let rewards = JSON.parse(localStorage.getItem('classroom_rewards')) || defaultRewards;
+        let eliminatedCards = new Set();
+        let currentChosenIndex = null;
+        let isAnimating = false;
 
         const arena = document.getElementById('arena');
         const shuffleBtn = document.getElementById('shuffleBtn');
         const randomBtn = document.getElementById('randomBtn');
-        let isShuffling = false;
 
-        // Âm thanh Web Audio API
+        // Âm thanh
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playWhooshSound() {
@@ -421,14 +460,29 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(160, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(650, audioCtx.currentTime + 0.15);
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.12);
             gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+            osc.stop(audioCtx.currentTime + 0.12);
+        }
+
+        function playFlipSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
         }
 
         function playVictorySound() {
@@ -448,9 +502,9 @@
             });
         }
 
-        // Tọa độ dạng lưới 2 hàng x 4 cột
+        // Tọa độ lưới 2 hàng x 4 cột
         function getGridPosition(index) {
-            const cardW = 190, cardH = 240, gapX = 40, gapY = 30;
+            const cardW = 190, cardH = 250, gapX = 40, gapY = 25;
             const cols = 4;
             const row = Math.floor(index / cols);
             const col = index % cols;
@@ -464,21 +518,40 @@
             return { x, y };
         }
 
-        // Vẽ các thẻ ra màn hình
+        // Vẽ thẻ vào sân khấu
         function initCards() {
             arena.innerHTML = '';
             rewards.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.id = `card-${index}`;
-                card.innerHTML = `
-                    <div class="card-badge">🧧</div>
-                    <div class="card-label">Thẻ số ${index + 1}</div>
+                const wrapper = document.createElement('div');
+                wrapper.className = 'card-wrapper';
+                wrapper.id = `card-wrap-${index}`;
+
+                wrapper.innerHTML = `
+                    <div class="card-inner">
+                        <!-- Mặt sau: Úp -->
+                        <div class="card-face card-back">
+                            <div class="card-badge">🧧</div>
+                            <div class="card-label">Thẻ số ${index + 1}</div>
+                        </div>
+                        <!-- Mặt trước: Ngửa lộ quà -->
+                        <div class="card-face card-front">
+                            <div class="reward-icon">${item.icon}</div>
+                            <div class="reward-title">${item.text}</div>
+                        </div>
+                    </div>
                 `;
+
                 const pos = getGridPosition(index);
-                card.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(0deg)`;
-                card.onclick = () => openCard(index);
-                arena.appendChild(card);
+                wrapper.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+                
+                // Học sinh bấm chọn trực tiếp không bị giật
+                wrapper.onclick = () => {
+                    if (!isAnimating && !eliminatedCards.has(index)) {
+                        pickAndRevealCard(index);
+                    }
+                };
+
+                arena.appendChild(wrapper);
             });
         }
 
@@ -487,135 +560,162 @@
             randomBtn.disabled = state;
         }
 
-        // Hiệu ứng xáo bài xoay vòng tròn
-        function startCircularShuffle(callback = null) {
-            if (isShuffling) return;
-            isShuffling = true;
+        // Xáo bài theo quỹ đạo hình ELIP mượt mà
+        function startEllipseShuffle(callback = null) {
+            if (isAnimating) return;
+
+            // Lấy danh sách thẻ còn lại chưa bị loại trừ
+            const activeIndices = [];
+            rewards.forEach((_, idx) => {
+                if (!eliminatedCards.has(idx)) activeIndices.push(idx);
+            });
+
+            if (activeIndices.length <= 1) {
+                if (callback) callback();
+                return;
+            }
+
+            isAnimating = true;
             setButtonsDisabled(true);
 
-            // Gỡ bỏ spotlight nếu có
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('spotlight'));
-
-            const total = rewards.length;
-            const radius = 240;
+            // Bán kính trục elip (rx: ngang, ry: dọc)
+            const rx = 360;
+            const ry = 140;
             const startTime = performance.now();
-            const duration = 2400; // Xoay trong 2.4s
+            const duration = 2200; // Xoay 2.2 giây
             let lastAudio = 0;
 
-            function animateShuffle(currentTime) {
+            function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
 
-                if (elapsed - lastAudio > 140) {
+                if (elapsed - lastAudio > 130) {
                     playWhooshSound();
                     lastAudio = elapsed;
                 }
 
-                const baseAngle = progress * Math.PI * 6; // Xoay 3 vòng tròn
+                // Xoay 2.5 vòng elip
+                const baseAngle = progress * Math.PI * 5;
 
-                for (let i = 0; i < total; i++) {
-                    const card = document.getElementById(`card-${i}`);
-                    if (!card) continue;
-                    card.classList.add('shuffling');
+                activeIndices.forEach((cardIdx, i) => {
+                    const el = document.getElementById(`card-wrap-${cardIdx}`);
+                    if (!el) return;
 
-                    const angle = baseAngle + (i / total) * Math.PI * 2;
-                    const x = Math.cos(angle) * radius;
-                    const y = Math.sin(angle) * (radius * 0.7);
-                    const rot = (angle * 180 / Math.PI) + 90;
+                    const angle = baseAngle + (i / activeIndices.length) * Math.PI * 2;
+                    const x = Math.cos(angle) * rx;
+                    const y = Math.sin(angle) * ry;
+                    // Phóng to nhẹ khi ở phía trước của elip để tạo chiều sâu 3D
+                    const scale = 0.85 + (Math.sin(angle) + 1) * 0.12; 
+                    const rot = Math.cos(angle) * 15;
 
-                    card.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(0.95)`;
-                }
+                    el.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(${scale})`;
+                });
 
                 if (progress < 1) {
-                    requestAnimationFrame(animateShuffle);
+                    requestAnimationFrame(animate);
                 } else {
-                    // Trộn ngẫu nhiên danh sách quà
-                    rewards.sort(() => Math.random() - 0.5);
-
+                    // Trả thẻ về vị trí phẳng ban đầu
                     setTimeout(() => {
-                        for (let i = 0; i < total; i++) {
-                            const card = document.getElementById(`card-${i}`);
-                            if (!card) continue;
-                            card.classList.remove('shuffling');
-                            const pos = getGridPosition(i);
-                            card.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(0deg) scale(1)`;
-                        }
-                        isShuffling = false;
+                        activeIndices.forEach((cardIdx) => {
+                            const el = document.getElementById(`card-wrap-${cardIdx}`);
+                            if (!el) return;
+                            const pos = getGridPosition(cardIdx);
+                            el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(0deg) scale(1)`;
+                        });
+                        isAnimating = false;
                         setButtonsDisabled(false);
 
                         if (callback) callback();
-                    }, 250);
+                    }, 200);
                 }
             }
 
-            requestAnimationFrame(animateShuffle);
+            requestAnimationFrame(animate);
         }
 
-        // Shuffle xoay tròn rồi tự động chọn ngẫu nhiên 1 thẻ
-        function shuffleAndPickRandom() {
-            if (isShuffling) return;
+        // Chọn và Lật thẻ (Tự Flip 3D ngay lập tức)
+        function pickAndRevealCard(index) {
+            if (isAnimating || eliminatedCards.has(index)) return;
+            isAnimating = true;
+            setButtonsDisabled(true);
+            currentChosenIndex = index;
 
-            // Tìm những thẻ chưa được mở
-            const unopenedIndices = [];
+            const el = document.getElementById(`card-wrap-${index}`);
+
+            // 1. Phóng to thẻ ra giữa màn hình
+            el.classList.add('focus-center');
+            playFlipSound();
+
+            // 2. Tự động lật mặt thẻ (Flip 3D) sau 0.25s
+            setTimeout(() => {
+                el.classList.add('flipped');
+                playVictorySound();
+
+                confetti({
+                    particleCount: 80,
+                    spread: 80,
+                    origin: { y: 0.55 }
+                });
+
+                // 3. Hiển thị thông báo nhận quà sau khi học sinh xem rõ thẻ lật
+                setTimeout(() => {
+                    document.getElementById('rewardEmoji').innerText = rewards[index].icon;
+                    document.getElementById('rewardText').innerText = rewards[index].text;
+                    document.getElementById('rewardModal').classList.add('active');
+                }, 800);
+            }, 300);
+        }
+
+        // Shuffle xoay tròn elip rồi tự chọn ngẫu nhiên
+        function shuffleAndPickRandom() {
+            if (isAnimating) return;
+
+            const available = [];
             rewards.forEach((_, idx) => {
-                const card = document.getElementById(`card-${idx}`);
-                if (card && !card.classList.contains('opened')) {
-                    unopenedIndices.push(idx);
-                }
+                if (!eliminatedCards.has(idx)) available.push(idx);
             });
 
-            if (unopenedIndices.length === 0) {
-                alert("Tất cả các thẻ đã được mở hết rồi! Vui lòng bấm 'Đặt Lại' nhé.");
+            if (available.length === 0) {
+                alert("Tất cả thẻ đã được mở hết! Nhấn 'Đặt Lại Trò Chơi' để chơi ván mới.");
                 return;
             }
 
-            // Xáo bài trước, xong mới chọn
-            startCircularShuffle(() => {
-                const randomChoice = unopenedIndices[Math.floor(Math.random() * unopenedIndices.length)];
-                const chosenCard = document.getElementById(`card-${randomChoice}`);
-
-                // Tạo hiệu ứng tỏa hào quang nổi bật vào thẻ được chọn
-                chosenCard.classList.add('spotlight');
-
-                // Tự động mở thẻ sau 0.8 giây
+            startEllipseShuffle(() => {
+                const randomChoice = available[Math.floor(Math.random() * available.length)];
                 setTimeout(() => {
-                    chosenCard.classList.remove('spotlight');
-                    openCard(randomChoice);
-                }, 800);
+                    pickAndRevealCard(randomChoice);
+                }, 150);
             });
         }
 
-        // Mở thẻ và bật hiệu ứng chúc mừng
-        function openCard(index) {
-            if (isShuffling) return;
-            const cardEl = document.getElementById(`card-${index}`);
-            if (cardEl.classList.contains('opened')) return;
-
-            cardEl.classList.add('opened');
-            playVictorySound();
-
-            confetti({
-                particleCount: 100,
-                spread: 100,
-                origin: { y: 0.6 }
-            });
-
-            document.getElementById('rewardEmoji').innerText = rewards[index].icon;
-            document.getElementById('rewardText').innerText = rewards[index].text;
-            document.getElementById('rewardModal').classList.add('active');
-        }
-
+        // Đóng quà và TỰ ĐỘNG ELIMINATE (Loại trừ thẻ vừa nhận)
         function closeReward() {
             document.getElementById('rewardModal').classList.remove('active');
+
+            if (currentChosenIndex !== null) {
+                const el = document.getElementById(`card-wrap-${currentChosenIndex}`);
+                if (el) {
+                    // Biến mất khỏi màn hình
+                    el.classList.remove('focus-center');
+                    el.classList.add('eliminated');
+                    eliminatedCards.add(currentChosenIndex);
+                }
+                currentChosenIndex = null;
+            }
+
+            isAnimating = false;
+            setButtonsDisabled(false);
         }
 
+        // Đặt lại toàn bộ trò chơi
         function resetGame() {
-            if (isShuffling) return;
-            document.querySelectorAll('.card').forEach(c => {
-                c.classList.remove('opened');
-                c.classList.remove('spotlight');
+            if (isAnimating) return;
+            eliminatedCards.clear();
+            currentChosenIndex = null;
+            document.querySelectorAll('.card-wrapper').forEach(el => {
+                el.className = 'card-wrapper';
             });
-            startCircularShuffle();
+            startEllipseShuffle();
         }
 
         // ================= CÀI ĐẶT PHẦN THƯỞNG =================
@@ -652,10 +752,11 @@
 
             localStorage.setItem('classroom_rewards', JSON.stringify(rewards));
             closeConfigModal();
+            initCards();
             resetGame();
         }
 
-        // Khởi tạo thẻ ban đầu
+        // Khởi tạo lần đầu
         initCards();
     </script>
 </body>
